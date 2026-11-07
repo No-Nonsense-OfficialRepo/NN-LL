@@ -14,3 +14,9 @@ This is a test release. The launcher executables are unsigned, so Windows and an
 The Essential Build Source ZIP includes the verified prebuilt VLA runtime for the standard build. The Git source repository omits that assembled runtime; the native README explains how to reproduce and assemble it. See the build guide to choose the right download.
 
 Download the complete Windows package from a GitHub Release when one is published. GitHub's automatically generated source ZIP is source code, not a runnable launcher package. Keep `Host.exe`, `Client.exe`, `Quick Start.exe`, and `Launcher Bin/` together.
+
+## Community and tutorials
+
+- [No-Nonsense on YouTube](https://www.youtube.com/@NoNonsenseLAN) — app tutorials and walkthroughs are coming soon.
+- [Join our Discord](https://discord.com/invite/a9NgtcnH5r) — quick chats, setup questions and feedback.
+- Use this repository's Issues tab for reproducible bug reports so they can be tracked.

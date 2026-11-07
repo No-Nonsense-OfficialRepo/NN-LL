@@ -19,8 +19,14 @@ GitHub's automatic source-code archive omits the assembled VLA runtime. The Esse
 
 ## Test status and limits
 
-An isolated public-source snapshot passed 797 automated tests during preparation. A complete launcher build using a separate Python environment and locked dependencies also passed packaged Host/Client startup checks before the latest native notice rebuild. The rebuilt native package passed source, hash, identity and signature validation. It has not yet had a new physical two-PC join/game test. These results cover different checkpoints and are not a single end-to-end certification of this source snapshot.
+An isolated public-source snapshot passed 797 automated tests during preparation. A complete launcher build using a separate Python environment and locked dependencies also passed packaged Host/Client startup checks before the latest native notice rebuild. The rebuilt native package passed source, hash, identity and signature validation. The maintainer has also completed a successful two-PC join/game test with the rebuilt native runtime. These results cover different checkpoints and are not a single end-to-end certification of this source snapshot.
 
 The launcher and private VLA service are unsigned developer builds. The original third-party driver retains its own signature. Game prerequisites are not installed automatically. General remote play and broad Windows/network compatibility are not established. Host and Client releases must match exactly.
 
 For problems, open a bug report with the version, Windows build, reproduction steps and a reviewed error excerpt. See the included build guide and Security policy. Preserve component licenses and notices when redistributing; the native verification report records its scope and limitations.
+
+## Community and tutorials
+
+- [YouTube — No-Nonsense](https://www.youtube.com/@NoNonsenseLAN): app tutorials and walkthroughs are coming soon.
+- [Discord](https://discord.com/invite/a9NgtcnH5r): quick chats, setup questions and feedback.
+- Use GitHub Issues for reproducible bug reports.
