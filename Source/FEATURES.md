@@ -42,10 +42,3 @@ This is the current feature map for the Windows Host and Client. **Implemented**
 - Automatic dedicated game-server launch from manifests is **not shipped**. The Host shares a playlist and files; a game may launch its own server through its normal executable.
 - A standalone Windows system installer, publisher signature, and universal game prerequisite installer are **not shipped**.
 
-## Evidence needed before stronger claims
-
-Record the release versions and protocol, Windows builds, network topology, VLA state, exact steps, and result for each physical test. Priority acceptance runs are: clean-client offline preparation; signed moon discovery and internet-disconnected two-PC join; protected room admission and mismatch sharing; close/reopen and Host-loss recovery; a large game download with peer sharing; and an actual multiplayer game session. Automated tests, isolated Qt previews, and packaged startup checks should be reported separately from those results.
-
-## User acceptance report — 6 November 2026
-
-The user reports completing clean-machine offline VLA installation, an internet-disconnected two-PC moon join, close/reopen recovery, a large transfer with peers, and a real multiplayer session, with no apparent frontend issues. This supersedes the pending status of those checks above for the tested setup. Exact release, Windows builds, topology, and logs were not supplied in this report; broader compatibility remains unmeasured.

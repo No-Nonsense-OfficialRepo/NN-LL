@@ -35,7 +35,7 @@ VLA setup, service operations, launcher firewall rules, moon installation, adapt
 
 An interrupted VLA installation can resume with the same verified package and installing user. Network profile recovery checks the saved adapter and network identity before restoring a category; old records containing only interface indexes require manual restoration. If an administrator operation times out, its helper may still be running: wait for it to exit before retrying. Its request and eventual result are retained at the location shown in the error.
 
-Code paths and local tests establish much of this behavior; they do not prove every physical network arrangement. See [`FEATURES.md`](FEATURES.md) for implemented, packaged, and live-validation status. On 6 November 2026 the user reported completing offline VLA preparation, an internet-disconnected two-PC moon join, close/reopen recovery, a large transfer with peers, and a real multiplayer session without apparent frontend issues. Exact test configuration and logs remain unrecorded; see the acceptance report in FEATURES.md.
+Code paths and local tests establish much of this behavior; they do not prove every physical network arrangement. See [`FEATURES.md`](FEATURES.md) for implemented, packaged, and live-validation status.
 
 ## Build and source layout
 
