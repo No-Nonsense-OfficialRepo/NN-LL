@@ -1,0 +1,1133 @@
+diff --git a/include/ZeroTierOne.h b/include/ZeroTierOne.h
+index 4482346..a14ad10 100644
+--- a/include/ZeroTierOne.h
++++ b/include/ZeroTierOne.h
+@@ -69,7 +69,8 @@ extern "C" {
+ /**
+  * Default UDP port for devices running a ZeroTier endpoint
+  */
+-#define ZT_DEFAULT_PORT 9993
++// Modified for LAN Launcher VLA: isolated API/transport port.
++#define ZT_DEFAULT_PORT 47993
+ 
+ /**
+  * Minimum MTU, which is the minimum allowed by IPv6 and several specs
+diff --git a/one.cpp b/one.cpp
+index 2e4e638..730a0ef 100644
+--- a/one.cpp
++++ b/one.cpp
+@@ -104,9 +104,10 @@ using namespace ZeroTier;
+ 
+ static OneService *volatile zt1Service = (OneService *)0;
+ 
+-#define PROGRAM_NAME "ZeroTier One"
++// Modified for LAN Launcher VLA. Upstream attribution retained below.
++#define PROGRAM_NAME "VLA - Virtual LAN Adaptor"
+ #define COPYRIGHT_NOTICE "Copyright (c) 2020 ZeroTier, Inc."
+-#define LICENSE_GRANT "Licensed under the ZeroTier BSL 1.1 (see LICENSE.txt)"
++#define LICENSE_GRANT "Apache-2.0 after upstream Change Date 2026-01-01 (see LICENSE.txt)"
+ 
+ /****************************************************************************/
+ /* zerotier-cli personality                                                 */
+@@ -129,7 +130,7 @@ static void cliPrintHelp(const char *pn,FILE *out)
+ 	fprintf(out,"  -h                      - Display this help" ZT_EOL_S);
+ 	fprintf(out,"  -v                      - Show version" ZT_EOL_S);
+ 	fprintf(out,"  -j                      - Display full raw JSON output" ZT_EOL_S);
+-	fprintf(out,"  -D<path>                - ZeroTier home path for parameter auto-detect" ZT_EOL_S);
++	fprintf(out,"  -D<path>                - VLA home path for parameter auto-detect" ZT_EOL_S);
+ 	fprintf(out,"  -p<port>                - HTTP port (default: auto)" ZT_EOL_S);
+ 	fprintf(out,"  -T<token>               - Authentication token (default: auto)" ZT_EOL_S);
+ 	fprintf(out,ZT_EOL_S"Available commands:" ZT_EOL_S);
+@@ -326,7 +327,7 @@ static int cli(int argc,char **argv)
+ 		const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/status",requestHeaders,responseHeaders,responseBody);
+ 
+ 		if (scode == 0) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 
+@@ -361,7 +362,7 @@ static int cli(int argc,char **argv)
+ 		const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/peer",requestHeaders,responseHeaders,responseBody);
+ 
+ 		if (scode == 0) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 
+@@ -430,7 +431,7 @@ static int cli(int argc,char **argv)
+ 		const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/peer",requestHeaders,responseHeaders,responseBody);
+ 
+ 		if (scode == 0) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 
+@@ -519,7 +520,7 @@ static int cli(int argc,char **argv)
+ 		if (arg1 == "list") {
+ 			const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/peer",requestHeaders,responseHeaders,responseBody);
+ 			if (scode == 0) {
+-				printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++				printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 				return 1;
+ 			}
+ 			nlohmann::json j;
+@@ -632,7 +633,7 @@ static int cli(int argc,char **argv)
+ 					responseHeaders,
+ 					responseBody);
+ 				if (scode == 0) {
+-					printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++					printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 					return 1;
+ 				}
+ 				nlohmann::json j;
+@@ -714,7 +715,7 @@ static int cli(int argc,char **argv)
+ 		const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/peer",requestHeaders,responseHeaders,responseBody);
+ 
+ 		if (scode == 0) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 
+@@ -769,7 +770,7 @@ static int cli(int argc,char **argv)
+ 		const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/network",requestHeaders,responseHeaders,responseBody);
+ 
+ 		if (scode == 0) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 
+@@ -890,7 +891,7 @@ static int cli(int argc,char **argv)
+ 		const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/moon",requestHeaders,responseHeaders,responseBody);
+ 
+ 		if (scode == 0) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 
+@@ -1013,7 +1014,7 @@ static int cli(int argc,char **argv)
+ 		}
+ 		const unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/network",requestHeaders,responseHeaders,responseBody);
+ 		if (scode == 0) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 		nlohmann::json j;
+@@ -1114,7 +1115,7 @@ static int cli(int argc,char **argv)
+ 		dump << "status" << ZT_EOL_S << "------" << ZT_EOL_S;
+ 		unsigned int scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/status",requestHeaders,responseHeaders,responseBody);
+ 		if (scode != 200) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 		dump << responseBody << ZT_EOL_S;
+@@ -1126,7 +1127,7 @@ static int cli(int argc,char **argv)
+ 		dump << ZT_EOL_S << "networks" << ZT_EOL_S << "--------" << ZT_EOL_S;
+ 		scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/network",requestHeaders,responseHeaders,responseBody);
+ 		if (scode != 200) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 		dump << responseBody << ZT_EOL_S;
+@@ -1138,7 +1139,7 @@ static int cli(int argc,char **argv)
+ 		dump << ZT_EOL_S << "peers" << ZT_EOL_S << "-----" << ZT_EOL_S;
+ 		scode = Http::GET(1024 * 1024 * 16,60000,(const struct sockaddr *)&addr,"/peer",requestHeaders,responseHeaders,responseBody);
+ 		if (scode != 200) {
+-			printf("Error connecting to the ZeroTier service: %s\n\nPlease check that the service is running and that TCP port 9993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
++			printf("Error connecting to the VLA service: %s\n\nPlease check that the service is running and that TCP port 47993 can be contacted via 127.0.0.1." ZT_EOL_S, responseBody.c_str());
+ 			return 1;
+ 		}
+ 		dump << responseBody << ZT_EOL_S;
+@@ -1884,7 +1885,7 @@ static void _winPokeAHole()
+ 		startupInfo.cb = sizeof(startupInfo);
+ 		memset(&startupInfo,0,sizeof(STARTUPINFOA));
+ 		memset(&processInfo,0,sizeof(PROCESS_INFORMATION));
+-		if (CreateProcessA(NULL,(LPSTR)(std::string("C:\\Windows\\System32\\netsh.exe advfirewall firewall delete rule name=\"ZeroTier One\" program=\"") + myPath + "\"").c_str(),NULL,NULL,FALSE,CREATE_NO_WINDOW,NULL,NULL,&startupInfo,&processInfo)) {
++		if (CreateProcessA(NULL,(LPSTR)(std::string("C:\\Windows\\System32\\netsh.exe advfirewall firewall delete rule name=\"LAN Launcher VLA\" program=\"") + myPath + "\"").c_str(),NULL,NULL,FALSE,CREATE_NO_WINDOW,NULL,NULL,&startupInfo,&processInfo)) {
+ 			WaitForSingleObject(processInfo.hProcess,INFINITE);
+ 			CloseHandle(processInfo.hProcess);
+ 			CloseHandle(processInfo.hThread);
+@@ -1893,7 +1894,7 @@ static void _winPokeAHole()
+ 		startupInfo.cb = sizeof(startupInfo);
+ 		memset(&startupInfo,0,sizeof(STARTUPINFOA));
+ 		memset(&processInfo,0,sizeof(PROCESS_INFORMATION));
+-		if (CreateProcessA(NULL,(LPSTR)(std::string("C:\\Windows\\System32\\netsh.exe advfirewall firewall add rule name=\"ZeroTier One\" dir=in action=allow program=\"") + myPath + "\" enable=yes").c_str(),NULL,NULL,FALSE,CREATE_NO_WINDOW,NULL,NULL,&startupInfo,&processInfo)) {
++		if (CreateProcessA(NULL,(LPSTR)(std::string("C:\\Windows\\System32\\netsh.exe advfirewall firewall add rule name=\"LAN Launcher VLA\" dir=in action=allow program=\"") + myPath + "\" enable=yes").c_str(),NULL,NULL,FALSE,CREATE_NO_WINDOW,NULL,NULL,&startupInfo,&processInfo)) {
+ 			WaitForSingleObject(processInfo.hProcess,INFINITE);
+ 			CloseHandle(processInfo.hProcess);
+ 			CloseHandle(processInfo.hThread);
+@@ -1902,7 +1903,7 @@ static void _winPokeAHole()
+ 		startupInfo.cb = sizeof(startupInfo);
+ 		memset(&startupInfo,0,sizeof(STARTUPINFOA));
+ 		memset(&processInfo,0,sizeof(PROCESS_INFORMATION));
+-		if (CreateProcessA(NULL,(LPSTR)(std::string("C:\\Windows\\System32\\netsh.exe advfirewall firewall add rule name=\"ZeroTier One\" dir=out action=allow program=\"") + myPath + "\" enable=yes").c_str(),NULL,NULL,FALSE,CREATE_NO_WINDOW,NULL,NULL,&startupInfo,&processInfo)) {
++		if (CreateProcessA(NULL,(LPSTR)(std::string("C:\\Windows\\System32\\netsh.exe advfirewall firewall add rule name=\"LAN Launcher VLA\" dir=out action=allow program=\"") + myPath + "\" enable=yes").c_str(),NULL,NULL,FALSE,CREATE_NO_WINDOW,NULL,NULL,&startupInfo,&processInfo)) {
+ 			WaitForSingleObject(processInfo.hProcess,INFINITE);
+ 			CloseHandle(processInfo.hProcess);
+ 			CloseHandle(processInfo.hThread);
+@@ -2019,7 +2020,7 @@ static void printHelp(const char *cn,FILE *out)
+ 	fprintf(out,"  -h                - Display this help" ZT_EOL_S);
+ 	fprintf(out,"  -v                - Show version" ZT_EOL_S);
+ 	fprintf(out,"  -U                - Skip privilege check and do not attempt to drop privileges" ZT_EOL_S);
+-	fprintf(out,"  -p<port>          - Port for UDP and TCP/HTTP (default: 9993, 0 for random)" ZT_EOL_S);
++	fprintf(out,"  -p<port>          - Port for UDP and TCP/HTTP (default: 47993, 0 for random)" ZT_EOL_S);
+ 
+ #ifdef __UNIX_LIKE__
+ 	fprintf(out,"  -d                - Fork and run as daemon (Unix-ish OSes)" ZT_EOL_S);
+diff --git a/osdep/OSUtils.cpp b/osdep/OSUtils.cpp
+index e98a2c7..c54fc4f 100644
+--- a/osdep/OSUtils.cpp
++++ b/osdep/OSUtils.cpp
+@@ -419,12 +419,11 @@ std::string OSUtils::platformDefaultHomePath()
+ 
+     // Check for user-defined environment variable before using defaults
+ #ifdef __WINDOWS__
+-	DWORD bufferSize = 65535;
+-	std::string userDefinedPath;
+-	bufferSize = GetEnvironmentVariable("ZEROTIER_HOME", &userDefinedPath[0], bufferSize);
+-	if (bufferSize) {
+-		return userDefinedPath;
+-	}
++    // Modified for LAN Launcher VLA: private home and safe Windows API storage.
++    char userDefinedPath[32768];
++    DWORD pathLength = GetEnvironmentVariableA("VLA_HOME", userDefinedPath, sizeof(userDefinedPath));
++    if (pathLength && pathLength < sizeof(userDefinedPath))
++        return std::string(userDefinedPath, pathLength);
+ #else
+ 	if(const char* userDefinedPath = getenv("ZEROTIER_HOME")) {
+ 		return std::string(userDefinedPath);
+@@ -455,8 +454,8 @@ std::string OSUtils::platformDefaultHomePath()
+ 	// Look up app data folder on Windows, e.g. C:\ProgramData\...
+ 	char buf[16384];
+ 	if (SUCCEEDED(SHGetFolderPathA(NULL,CSIDL_COMMON_APPDATA,NULL,0,buf)))
+-		return (std::string(buf) + "\\ZeroTier\\One");
+-	else return std::string("C:\\ZeroTier\\One");
++		return (std::string(buf) + "\\LAN Launcher\\VLA");
++	else return std::string("C:\\ProgramData\\LAN Launcher\\VLA");
+ #else
+ 
+ 	return (std::string(ZT_PATH_SEPARATOR_S) + "ZeroTier" + ZT_PATH_SEPARATOR_S + "One"); // UNKNOWN PLATFORM
+diff --git a/osdep/WinDNSHelper.cpp b/osdep/WinDNSHelper.cpp
+index 6bcd2b4..bf81c72 100644
+--- a/osdep/WinDNSHelper.cpp
++++ b/osdep/WinDNSHelper.cpp
+@@ -1,3 +1,4 @@
++// Modified for LAN Launcher VLA: DNS policy ownership marker.
+ #include "WinDNSHelper.hpp"
+ 
+ #include <comdef.h>
+@@ -242,8 +243,8 @@ std::vector<std::string> getValueList(const char* key) {
+ 
+ std::pair<bool, std::string> WinDNSHelper::hasDNSConfig(uint64_t nwid)
+ {
+-	char networkStr[20] = { 0 };
+-	sprintf(networkStr, "%.16llx", nwid);
++	char networkStr[32] = { 0 };
++	sprintf(networkStr, "LANLauncherVLA:%.16llx", nwid);
+ 
+ 	const char* baseKey = "SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters\\DnsPolicyConfig";
+ 	auto subkeys = getSubKeys(baseKey);
+@@ -326,7 +327,7 @@ void WinDNSHelper::setDNS(uint64_t nwid, const char* domain, const std::vector<I
+ 		RegCreateKeyA(HKEY_LOCAL_MACHINE, fullKey, &dnsKey);
+ 		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, fullKey, 0, KEY_READ | KEY_WRITE, &dnsKey) == ERROR_SUCCESS) {
+ 			char nwString[32] = { 0 };
+-			sprintf(nwString, "%.16llx", nwid);
++			sprintf(nwString, "LANLauncherVLA:%.16llx", nwid);
+ 			RegSetKeyValueA(dnsKey, NULL, "Comment", REG_SZ, nwString, strlen(nwString));
+ 
+ 			DWORD configOpts = 8;
+diff --git a/osdep/WinFWHelper.cpp b/osdep/WinFWHelper.cpp
+index 40f3897..511adc6 100644
+--- a/osdep/WinFWHelper.cpp
++++ b/osdep/WinFWHelper.cpp
+@@ -1,3 +1,4 @@
++// Modified for LAN Launcher VLA: private rule names and interface aliases.
+ #include "WinFWHelper.hpp"
+ 
+ 
+@@ -50,8 +51,8 @@ void WinFWHelper::newICMPv4Rule(std::string address, uint64_t nwid)
+ 	sprintf(nwString, "%.16llx", nwid);
+ 	std::string nwString2 = { nwString };
+ 
+-		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "New-NetFirewallRule -DisplayName zerotier-icmpv4-)" + nwString2 + address +
+-			R"( -InterfaceAlias 'ZeroTier One `[)" + nwString2 + R"(`]')" + 
++		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "New-NetFirewallRule -DisplayName lanlauncher-vla-icmpv4-)" + nwString2 + address +
++			R"( -InterfaceAlias 'VLA `[)" + nwString2 + R"(`]')" + 
+ 			" -Protocol ICMPv4 -Action Allow" + 
+ 			" -LocalAddress " + address + "\"\r\n";
+ 		
+@@ -66,8 +67,8 @@ void WinFWHelper::newICMPv6Rule(std::string address, uint64_t nwid)
+ 		sprintf(nwString, "%.16llx", nwid);
+ 		std::string nwString2 = { nwString };
+ 
+-		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "New-NetFirewallRule -DisplayName zerotier-icmpv6-)" + nwString2 + address +
+-			R"( -InterfaceAlias 'ZeroTier One `[)" + nwString2 + R"(`]')" + 
++		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "New-NetFirewallRule -DisplayName lanlauncher-vla-icmpv6-)" + nwString2 + address +
++			R"( -InterfaceAlias 'VLA `[)" + nwString2 + R"(`]')" + 
+ 			" -Protocol ICMPv6 -Action Allow" + 
+ 			" -LocalAddress " + address + "\"\r\n";
+ 
+@@ -82,7 +83,7 @@ void WinFWHelper::removeICMPv4Rule(std::string addr, uint64_t nwid)
+ 		sprintf(nwString, "%.16llx", nwid);
+ 		std::string nwString2 = { nwString };
+ 
+-		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName zerotier-icmpv4-)" + nwString2 + addr +
++		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName lanlauncher-vla-icmpv4-)" + nwString2 + addr +
+ 		 "\"\r\n";
+ 
+ 		_run(cmd);
+@@ -96,7 +97,7 @@ void WinFWHelper::removeICMPv6Rule(std::string addr, uint64_t nwid)
+ 		sprintf(nwString, "%.16llx", nwid);
+ 		std::string nwString2 = { nwString };
+ 
+-		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName zerotier-icmpv6-)" + nwString2 + addr +
++		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName lanlauncher-vla-icmpv6-)" + nwString2 + addr +
+ 		 "\"\r\n";
+ 
+ 		_run(cmd);
+@@ -110,7 +111,7 @@ void WinFWHelper::removeICMPv4Rules(uint64_t nwid)
+ 		sprintf(nwString, "%.16llx", nwid);
+ 		std::string nwString2 = { nwString };
+ 
+-		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName zerotier-icmpv4-)" + nwString2 + "*\" \r\n";
++		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName lanlauncher-vla-icmpv4-)" + nwString2 + "*\" \r\n";
+ 		
+ 		_run(cmd);
+ }
+@@ -123,7 +124,7 @@ void WinFWHelper::removeICMPv6Rules(uint64_t nwid)
+ 		sprintf(nwString, "%.16llx", nwid);
+ 		std::string nwString2 = { nwString };
+ 
+-		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName zerotier-icmpv6-)" + nwString2 + "*\" \r\n";
++		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName lanlauncher-vla-icmpv6-)" + nwString2 + "*\" \r\n";
+ 
+ 		_run(cmd);
+ }
+@@ -132,7 +133,7 @@ void WinFWHelper::removeICMPRules()
+ {
+ 		// removes all icmp firewall rules for all networks
+ 
+-		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName zerotier-icmp*)" + std::string("\r\n");
++		std::string cmd = R"(C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe "Remove-NetFirewallRule -DisplayName lanlauncher-vla-icmp*)" + std::string("\r\n");
+ 
+ 		_run(cmd);
+ }
+diff --git a/osdep/WindowsEthernetTap.cpp b/osdep/WindowsEthernetTap.cpp
+index 9d644b1..4811383 100644
+--- a/osdep/WindowsEthernetTap.cpp
++++ b/osdep/WindowsEthernetTap.cpp
+@@ -88,8 +88,8 @@ public:
+ 		}
+ 		//tapDriverPath = "\\tap-windows\\x86\\zttap300.inf";
+ #endif
+-		tapDriverName = "zttap300";
+-		tapDriverPath = "\\zttap300.inf";
++		tapDriverName = "vlatap";
++		tapDriverPath = "\\driver\\vlatap.inf";
+ 
+ 		setupApiMod = LoadLibraryA("setupapi.dll");
+ 		if (!setupApiMod) {
+@@ -258,54 +258,8 @@ std::string WindowsEthernetTap::addNewPersistentTapDevice(const char *pathToInf,
+ 
+ std::string WindowsEthernetTap::destroyAllLegacyPersistentTapDevices()
+ {
+-	char subkeyName[1024];
+-	char subkeyClass[1024];
+-	char data[1024];
+-
+-	std::set<std::string> instanceIdPathsToRemove;
+-	{
+-		HKEY nwAdapters;
+-		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE,"SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}",0,KEY_READ|KEY_WRITE,&nwAdapters) != ERROR_SUCCESS)
+-			return std::string("Could not open registry key");
+-
+-		for(DWORD subkeyIndex=0;;++subkeyIndex) {
+-			DWORD type;
+-			DWORD dataLen;
+-			DWORD subkeyNameLen = sizeof(subkeyName);
+-			DWORD subkeyClassLen = sizeof(subkeyClass);
+-			FILETIME lastWriteTime;
+-			if (RegEnumKeyExA(nwAdapters,subkeyIndex,subkeyName,&subkeyNameLen,(DWORD *)0,subkeyClass,&subkeyClassLen,&lastWriteTime) == ERROR_SUCCESS) {
+-				type = 0;
+-				dataLen = sizeof(data);
+-				if (RegGetValueA(nwAdapters,subkeyName,"ComponentId",RRF_RT_ANY,&type,(PVOID)data,&dataLen) == ERROR_SUCCESS) {
+-					data[dataLen] = '\0';
+-
+-					if ((!strnicmp(data,"zttap",5))&&(WINENV.tapDriverName != data)) {
+-						std::string instanceIdPath;
+-						type = 0;
+-						dataLen = sizeof(data);
+-						if (RegGetValueA(nwAdapters,subkeyName,"DeviceInstanceID",RRF_RT_ANY,&type,(PVOID)data,&dataLen) == ERROR_SUCCESS)
+-							instanceIdPath.assign(data,dataLen);
+-						if (instanceIdPath.length() != 0)
+-							instanceIdPathsToRemove.insert(instanceIdPath);
+-					}
+-				}
+-			} else break; // end of list or failure
+-		}
+-
+-		RegCloseKey(nwAdapters);
+-	}
+-
+-	std::string errlist;
+-	for(std::set<std::string>::iterator iidp(instanceIdPathsToRemove.begin());iidp!=instanceIdPathsToRemove.end();++iidp) {
+-		std::string err = deletePersistentTapDevice(iidp->c_str());
+-		if (err.length() > 0) {
+-			if (errlist.length() > 0)
+-				errlist.push_back(',');
+-			errlist.append(err);
+-		}
+-	}
+-	return errlist;
++    // Modified for LAN Launcher VLA: no ordinary ZeroTier legacy devices are owned.
++    return std::string();
+ }
+ 
+ std::string WindowsEthernetTap::destroyAllPersistentTapDevices()
+@@ -332,7 +286,7 @@ std::string WindowsEthernetTap::destroyAllPersistentTapDevices()
+ 				if (RegGetValueA(nwAdapters,subkeyName,"ComponentId",RRF_RT_ANY,&type,(PVOID)data,&dataLen) == ERROR_SUCCESS) {
+ 					data[dataLen] = '\0';
+ 
+-					if (!strnicmp(data,"zttap",5)) {
++					if (!stricmp(data,"vlatap")) {
+ 						std::string instanceIdPath;
+ 						type = 0;
+ 						dataLen = sizeof(data);
+@@ -465,12 +419,22 @@ WindowsEthernetTap::WindowsEthernetTap(
+ 	_tap(INVALID_HANDLE_VALUE),
+ 	_friendlyName(friendlyName),
+ 	_injectSemaphore(INVALID_HANDLE_VALUE),
+-	_pathToHelpers(hp),
++	_pathToHelpers(),
+ 	_run(true),
+ 	_initialized(false),
+ 	_enabled(true),
+ 	_lastIfAddrsUpdate(0)
+ {
++    // Modified for LAN Launcher VLA: immutable package separate from private state.
++    char executablePath[32768];
++    DWORD executableLength = GetModuleFileNameA(NULL, executablePath, sizeof(executablePath));
++    if (!executableLength || executableLength >= sizeof(executablePath))
++        throw std::runtime_error("unable to find VLA executable directory");
++    _pathToHelpers.assign(executablePath, executableLength);
++    std::string::size_type separator = _pathToHelpers.find_last_of("\\/");
++    if (separator == std::string::npos)
++        throw std::runtime_error("invalid VLA executable directory");
++    _pathToHelpers.resize(separator);
+ 	char subkeyName[1024];
+ 	char subkeyClass[1024];
+ 	char data[1024];
+@@ -514,7 +478,7 @@ WindowsEthernetTap::WindowsEthernetTap(
+ 					if ((_netCfgInstanceId.length() == 0)&&(instanceId.length() != 0)&&(instanceIdPath.length() != 0)) {
+ 						type = 0;
+ 						dataLen = sizeof(data);
+-						if (RegGetValueA(nwAdapters,subkeyName,"_ZeroTierTapIdentifier",RRF_RT_ANY,&type,(PVOID)data,&dataLen) == ERROR_SUCCESS) {
++						if (RegGetValueA(nwAdapters,subkeyName,"_VLATapIdentifier",RRF_RT_ANY,&type,(PVOID)data,&dataLen) == ERROR_SUCCESS) {
+ 							data[dataLen] = '\0';
+ 							if (!strcmp(data,tag)) {
+ 								_netCfgInstanceId = instanceId;
+@@ -550,11 +514,11 @@ WindowsEthernetTap::WindowsEthernetTap(
+ 						if (WINENV.tapDriverName == data) {
+ 							type = 0;
+ 							dataLen = sizeof(data);
+-							if ((RegGetValueA(nwAdapters,subkeyName,"_ZeroTierTapIdentifier",RRF_RT_ANY,&type,(PVOID)data,&dataLen) != ERROR_SUCCESS)||(dataLen <= 0)) {
++							if ((RegGetValueA(nwAdapters,subkeyName,"_VLATapIdentifier",RRF_RT_ANY,&type,(PVOID)data,&dataLen) != ERROR_SUCCESS)||(dataLen <= 0)) {
+ 								type = 0;
+ 								dataLen = sizeof(data);
+ 								if (RegGetValueA(nwAdapters,subkeyName,"NetCfgInstanceId",RRF_RT_ANY,&type,(PVOID)data,&dataLen) == ERROR_SUCCESS) {
+-									RegSetKeyValueA(nwAdapters,subkeyName,"_ZeroTierTapIdentifier",REG_SZ,tag,(DWORD)(strlen(tag)+1));
++									RegSetKeyValueA(nwAdapters,subkeyName,"_VLATapIdentifier",REG_SZ,tag,(DWORD)(strlen(tag)+1));
+ 
+ 									_netCfgInstanceId.assign(data,dataLen);
+ 
+@@ -976,7 +940,7 @@ void WindowsEthernetTap::threadMain()
+ 	HANDLE wait4[3];
+ 	OVERLAPPED tapOvlRead,tapOvlWrite;
+ 
+-	OSUtils::ztsnprintf(tapPath,sizeof(tapPath),"\\\\.\\Global\\%s.tap",_netCfgInstanceId.c_str());
++	OSUtils::ztsnprintf(tapPath,sizeof(tapPath),"\\\\.\\Global\\%s.vlatap",_netCfgInstanceId.c_str());
+ 
+ 	try {
+ 		while (_run) {
+diff --git a/service/OneService.cpp b/service/OneService.cpp
+index 594ff02..384dac0 100644
+--- a/service/OneService.cpp
++++ b/service/OneService.cpp
+@@ -283,7 +283,7 @@ class NetworkState
+ {
+ public:
+ 	NetworkState()
+-		: _webPort(9993)
++		: _webPort(ZT_DEFAULT_PORT)
+ 		, _tap((EthernetTap *)0)
+ #if ZT_SSO_ENABLED
+ 		, _idc(nullptr)
+@@ -1119,7 +1119,7 @@ public:
+ 
+ 				if (_ports[2]) {
+ 					char uniqueName[64];
+-					OSUtils::ztsnprintf(uniqueName,sizeof(uniqueName),"ZeroTier/%.10llx@%u",_node->address(),_ports[2]);
++					OSUtils::ztsnprintf(uniqueName,sizeof(uniqueName),"LANLauncherVLA/%.10llx@%u",_node->address(),_ports[2]);
+ 					_portMapper = new PortMapper(_ports[2],uniqueName);
+ 				}
+ 			}
+@@ -2625,19 +2625,12 @@ public:
+ #endif
+ 
+ #ifndef ZT_SDK
+-		const std::string up(OSUtils::jsonString(settings["softwareUpdate"],ZT_SOFTWARE_UPDATE_DEFAULT));
+-		const bool udist = OSUtils::jsonBool(settings["softwareUpdateDist"],false);
+-		if (((up == "apply")||(up == "download"))||(udist)) {
+-			if (!_updater)
+-				_updater = new SoftwareUpdater(*_node,_homePath);
+-			_updateAutoApply = (up == "apply");
+-			_updater->setUpdateDistribution(udist);
+-			_updater->setChannel(OSUtils::jsonString(settings["softwareUpdateChannel"],ZT_SOFTWARE_UPDATE_DEFAULT_CHANNEL));
+-		} else {
+-			delete _updater;
+-			_updater = (SoftwareUpdater *)0;
+-			_updateAutoApply = false;
+-		}
++        // Modified for LAN Launcher VLA: stock updates must never replace this fork.
++        settings["softwareUpdate"] = "disable";
++        settings["softwareUpdateDist"] = false;
++        delete _updater;
++        _updater = (SoftwareUpdater *)0;
++        _updateAutoApply = false;
+ #endif
+ 
+ 		json &ignoreIfs = settings["interfacePrefixBlacklist"];
+@@ -3176,7 +3169,7 @@ public:
+ 				if (!n.tap()) {
+ 					try {
+ 						char friendlyName[128];
+-						OSUtils::ztsnprintf(friendlyName,sizeof(friendlyName),"ZeroTier One [%.16llx]",nwid);
++						OSUtils::ztsnprintf(friendlyName,sizeof(friendlyName),"VLA [%.16llx]",nwid);
+ 
+ 						n.setTap(EthernetTap::newInstance(
+ 							nullptr,
+diff --git a/windows/TapDriver6/TapDriver6.vcxproj b/windows/TapDriver6/TapDriver6.vcxproj
+index 75e25f2..16e4abb 100644
+--- a/windows/TapDriver6/TapDriver6.vcxproj
++++ b/windows/TapDriver6/TapDriver6.vcxproj
+@@ -1,4 +1,5 @@
+-﻿<?xml version="1.0" encoding="utf-8"?>
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Modified for LAN Launcher VLA: isolated build target and dependencies. -->
+ <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Win8 Debug|ARM64">
+@@ -37,7 +38,7 @@
+   <PropertyGroup Label="Globals">
+     <RootNamespace>TapDriver6</RootNamespace>
+     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VisualStudioVersion)' == '11.0'">$(VCTargetsPath11)</VCTargetsPath>
+-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
++    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <PropertyGroup Label="PropertySheets">
+     <ConfigurationType>Driver</ConfigurationType>
+@@ -88,22 +89,22 @@
+     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|Win32'">
+-    <TargetName>zttap300</TargetName>
++    <TargetName>vlatap</TargetName>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|Win32'">
+-    <TargetName>zttap300</TargetName>
++    <TargetName>vlatap</TargetName>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'">
+-    <TargetName>zttap300</TargetName>
++    <TargetName>vlatap</TargetName>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|ARM64'">
+-    <TargetName>zttap300</TargetName>
++    <TargetName>vlatap</TargetName>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">
+-    <TargetName>zttap300</TargetName>
++    <TargetName>vlatap</TargetName>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|ARM64'">
+-    <TargetName>zttap300</TargetName>
++    <TargetName>vlatap</TargetName>
+   </PropertyGroup>
+   <ItemDefinitionGroup>
+     <ClCompile>
+@@ -140,25 +141,25 @@
+     </ClCompile>
+     <Link />
+     <Link>
+-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'">C:\WinDDK\7600.16385.1\lib\win7\amd64\ndis.lib;C:\WinDDK\7600.16385.1\lib\win7\amd64\ntstrsafe.lib;C:\WinDDK\7600.16385.1\lib\win7\amd64\wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|ARM64'">C:\WinDDK\7600.16385.1\lib\win7\amd64\ndis.lib;C:\WinDDK\7600.16385.1\lib\win7\amd64\ntstrsafe.lib;C:\WinDDK\7600.16385.1\lib\win7\amd64\wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'">ndis.lib;ntstrsafe.lib;wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|ARM64'">ndis.lib;ntstrsafe.lib;wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+     </Link>
+     <Link />
+     <Link />
+     <Link />
+     <Link>
+-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x64\ndis.lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x64\ntstrsafe.lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x64\wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Release|ARM64'">C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x64\ndis.lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x64\ntstrsafe.lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x64\wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">ndis.lib;ntstrsafe.lib;wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Release|ARM64'">ndis.lib;ntstrsafe.lib;wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+     </Link>
+     <Link />
+     <Link>
+-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|Win32'">C:\WinDDK\7600.16385.1\lib\win7\i386\ndis.lib;C:\WinDDK\7600.16385.1\lib\win7\i386\ntstrsafe.lib;C:\WinDDK\7600.16385.1\lib\win7\i386\wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|Win32'">ndis.lib;ntstrsafe.lib;wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+     </Link>
+     <Link />
+     <Link />
+     <Link />
+     <Link>
+-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Release|Win32'">C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x86\ndis.lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x86\ntstrsafe.lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\km\x86\wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Win8 Release|Win32'">ndis.lib;ntstrsafe.lib;wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+     </Link>
+     <Inf />
+     <Inf>
+@@ -232,7 +233,7 @@
+     <ResourceCompile Include="resource.rc" />
+   </ItemGroup>
+   <ItemGroup>
+-    <Inf Include="zttap300.inf">
++    <Inf Include="vlatap.inf">
+       <SpecifyDriverVerDirectiveVersion Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|Win32'">false</SpecifyDriverVerDirectiveVersion>
+       <TimeStamp Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|Win32'">3.00.00.0</TimeStamp>
+       <SpecifyDriverVerDirectiveVersion Condition="'$(Configuration)|$(Platform)'=='Win8 Release|Win32'">false</SpecifyDriverVerDirectiveVersion>
+diff --git a/windows/TapDriver6/config.h b/windows/TapDriver6/config.h
+index 30ea621..1506f20 100644
+--- a/windows/TapDriver6/config.h
++++ b/windows/TapDriver6/config.h
+@@ -1,9 +1,10 @@
+-#define PRODUCT_NAME			"ZeroTier Virtual Port"
++// Modified for LAN Launcher VLA: separate driver service and provider.
++#define PRODUCT_NAME			"VLA - Virtual LAN Adaptor"
+ #define PRODUCT_VERSION			"3.0.0"
+ #define PRODUCT_VERSION_RESOURCE	3,0,0,1
+-#define PRODUCT_TAP_WIN_COMPONENT_ID	"zttap300"
++#define PRODUCT_TAP_WIN_COMPONENT_ID	"vlatap"
+ #define PRODUCT_TAP_WIN_MAJOR		3
+ #define PRODUCT_TAP_WIN_MINOR		0
+-#define PRODUCT_TAP_WIN_PROVIDER		"ZeroTier"
++#define PRODUCT_TAP_WIN_PROVIDER		"LAN Launcher VLA"
+ #define PRODUCT_TAP_WIN_DEVICE_DESCRIPTION	PRODUCT_NAME
+ #define PRODUCT_TAP_WIN_RELDATE		"11/24/2020"
+diff --git a/windows/TapDriver6/device.c b/windows/TapDriver6/device.c
+index 7367143..5a314d4 100644
+--- a/windows/TapDriver6/device.c
++++ b/windows/TapDriver6/device.c
+@@ -1,3 +1,4 @@
++// Modified for LAN Launcher VLA: isolated device link suffix.
+ /*
+  *  TAP-Windows -- A kernel driver to provide virtual tap
+  *                 device functionality on Windows.
+@@ -1006,7 +1007,7 @@ tapMakeDeviceNames(
+ {
+     NDIS_STATUS     status;
+     NDIS_STRING     deviceNamePrefix = NDIS_STRING_CONST("\\Device\\");
+-    NDIS_STRING     tapNameSuffix = NDIS_STRING_CONST(".tap");
++    NDIS_STRING     tapNameSuffix = NDIS_STRING_CONST(".vlatap");
+ 
+     // Generate DeviceName from NetCfgInstanceId.
+     Adapter->DeviceName.Buffer = Adapter->DeviceNameBuffer;
+diff --git a/windows/TapDriver6/resource.rc b/windows/TapDriver6/resource.rc
+index 2b65e2b..6841769 100644
+--- a/windows/TapDriver6/resource.rc
++++ b/windows/TapDriver6/resource.rc
+@@ -1,3 +1,4 @@
++// Modified for LAN Launcher VLA; legal copyright attribution retained.
+ // Microsoft Visual C++ generated resource script.
+ //
+ #include "resource.h"
+@@ -30,13 +31,13 @@ BEGIN
+     BEGIN
+         BLOCK "040904b0"
+         BEGIN
+-            VALUE "CompanyName", "ZeroTier Networks LLC"
+-            VALUE "FileDescription", "ZeroTier One Virtual Network Port"
++            VALUE "CompanyName", "LAN Launcher VLA"
++            VALUE "FileDescription", "VLA - Virtual LAN Adaptor"
+             VALUE "FileVersion", "3.0.0 3/0"
+-            VALUE "InternalName", "zttap300.sys"
++            VALUE "InternalName", "vlatap.sys"
+             VALUE "LegalCopyright", "ZeroTier, Inc., OpenVPN Technologies, Inc."
+-            VALUE "OriginalFilename", "zttap300.sys"
+-            VALUE "ProductName", "ZeroTier One Virtual Network Port"
++            VALUE "OriginalFilename", "vlatap.sys"
++            VALUE "ProductName", "VLA - Virtual LAN Adaptor"
+             VALUE "ProductVersion", "3.0.0 3/0"
+         END
+     END
+diff --git a/windows/TapDriver6/tap-windows.h b/windows/TapDriver6/tap-windows.h
+index fd41a79..63ba606 100644
+--- a/windows/TapDriver6/tap-windows.h
++++ b/windows/TapDriver6/tap-windows.h
+@@ -1,3 +1,4 @@
++// Modified for LAN Launcher VLA: isolated device link suffix.
+ /*
+  *  TAP-Windows -- A kernel driver to provide virtual tap
+  *                 device functionality on Windows.
+@@ -78,6 +79,6 @@
+ #define USERMODEDEVICEDIR "\\\\.\\Global\\"
+ #define SYSDEVICEDIR      "\\Device\\"
+ #define USERDEVICEDIR     "\\DosDevices\\Global\\"
+-#define TAP_WIN_SUFFIX    ".tap"
++#define TAP_WIN_SUFFIX    ".vlatap"
+ 
+ #endif // __TAP_WIN_H
+diff --git a/windows/TapDriver6/zttap300.inf b/windows/TapDriver6/vlatap.inf
+similarity index 74%
+rename from windows/TapDriver6/zttap300.inf
+rename to windows/TapDriver6/vlatap.inf
+index 8e74daa..bb77f62 100644
+--- a/windows/TapDriver6/zttap300.inf
++++ b/windows/TapDriver6/vlatap.inf
+@@ -1,3 +1,4 @@
++; Modified for LAN Launcher VLA: isolated root device, service and package.
+ ;
+ ; ****************************************************************************
+ ; * Copyright (C) 2002-2014 OpenVPN Technologies, Inc.                       *
+@@ -23,32 +24,34 @@
+ 
+ [Version]
+ Signature = "$Windows NT$"
+-CatalogFile = zttap300.cat
++; Modified for current WDK checks: protect package files and run from Driver Store.
++PnpLockdown = 1
++CatalogFile = vlatap.cat
+ ClassGUID = {4d36e972-e325-11ce-bfc1-08002be10318}
+ Provider = %Provider%
+ Class = Net
+ DriverVer=11/24/2020,3.00.00.1
+ 
+ [Strings]
+-DeviceDescription = "ZeroTier Virtual Port"
+-Provider = "ZeroTier"
++DeviceDescription = "VLA - Virtual LAN Adaptor"
++Provider = "LAN Launcher VLA"
+ 
+ [Manufacturer]
+-%Provider%=zttap300,NTx86
+-%Provider%=zttap300,NTamd64
+-%Provider%=zttap300,NTarm64
++%Provider%=vlatap,NTx86.10.0...16299
++%Provider%=vlatap,NTamd64.10.0...16299
++%Provider%=vlatap,NTarm64.10.0...16299
+ 
+-[zttap300.NTx86]
+-%DeviceDescription% = zttap300.ndi, root\zttap300 ; Root enumerated
+-%DeviceDescription% = zttap300.ndi, zttap300      ; Legacy
++[vlatap.NTx86.10.0...16299]
++%DeviceDescription% = vlatap.ndi, root\vlatap ; Root enumerated
++%DeviceDescription% = vlatap.ndi, vlatap      ; Legacy
+ 
+-[zttap300.NTamd64]
+-%DeviceDescription% = zttap300.ndi, root\zttap300 ; Root enumerated
+-%DeviceDescription% = zttap300.ndi, zttap300      ; Legacy
++[vlatap.NTamd64.10.0...16299]
++%DeviceDescription% = vlatap.ndi, root\vlatap ; Root enumerated
++%DeviceDescription% = vlatap.ndi, vlatap      ; Legacy
+ 
+-[zttap300.NTarm64]
+-%DeviceDescription% = zttap300.ndi, root\zttap300 ; Root enumerated
+-%DeviceDescription% = zttap300.ndi, zttap300      ; Legacy
++[vlatap.NTarm64.10.0...16299]
++%DeviceDescription% = vlatap.ndi, root\vlatap ; Root enumerated
++%DeviceDescription% = vlatap.ndi, vlatap      ; Legacy
+ 
+ ;----------------- Characteristics ------------
+ ;    NCF_PHYSICAL = 0x04
+@@ -58,26 +61,26 @@ Provider = "ZeroTier"
+ ;    NCF_NO_SERVICE = 0x10
+ ;    NCF_HAS_UI = 0x80
+ ;----------------- Characteristics ------------
+-[zttap300.ndi]
+-CopyFiles       = zttap300.driver, zttap300.files
+-AddReg          = zttap300.reg
+-AddReg          = zttap300.params.reg
++[vlatap.ndi]
++CopyFiles       = vlatap.driver, vlatap.files
++AddReg          = vlatap.reg
++AddReg          = vlatap.params.reg
+ Characteristics = 0x81
+ *IfType            = 0x6 ; IF_TYPE_ETHERNET_CSMACD
+ *MediaType         = 0x0 ; NdisMedium802_3
+ *PhysicalMediaType = 14  ; NdisPhysicalMedium802_3
+ 
+-[zttap300.ndi.Services]
+-AddService = zttap300,        2, zttap300.service
++[vlatap.ndi.Services]
++AddService = vlatap,        2, vlatap.service
+ 
+-[zttap300.reg]
+-HKR, Ndi,            Service,      0, "zttap300"
++[vlatap.reg]
++HKR, Ndi,            Service,      0, "vlatap"
+ HKR, Ndi\Interfaces, UpperRange,   0, "ndis5" ; yes, 'ndis5' is correct... yup, Windows.
+ HKR, Ndi\Interfaces, LowerRange,   0, "ethernet"
+ HKR, ,               Manufacturer, 0, "%Provider%"
+ HKR, ,               ProductName,  0, "%DeviceDescription%"
+ 
+-[zttap300.params.reg]
++[vlatap.params.reg]
+ HKR, Ndi\params\MTU,                  ParamDesc, 0, "MTU"
+ HKR, Ndi\params\MTU,                  Type,      0, "int"
+ HKR, Ndi\params\MTU,                  Default,   0, "2800"
+@@ -114,13 +117,13 @@ HKR, Ndi\params\AllowNonAdmin\enum,   "1",       0, "Allowed"
+ ;    SERVICE_DISABLED     = 0x4
+ ;---------- Start Mode ---------------
+ 
+-[zttap300.service]
++[vlatap.service]
+ DisplayName = %DeviceDescription%
+ ServiceType = 1
+ StartType = 3
+ ErrorControl = 1
+ LoadOrderGroup = NDIS
+-ServiceBinary = %12%\zttap300.sys
++ServiceBinary = %13%\vlatap.sys
+ 
+ ;----------------- Copy Flags ------------
+ ;    COPYFLG_NOSKIP = 0x02
+@@ -128,18 +131,18 @@ ServiceBinary = %12%\zttap300.sys
+ ;----------------- Copy Flags ------------
+ 
+ [SourceDisksNames]
+-1 = %DeviceDescription%, zttap300.sys
++1 = %DeviceDescription%, vlatap.sys
+ 
+ [SourceDisksFiles]
+-zttap300.sys = 1
++vlatap.sys = 1
+ 
+ [DestinationDirs]
+-zttap300.files  = 11
+-zttap300.driver = 12
++vlatap.files  = 11
++vlatap.driver = 13
+ 
+-[zttap300.files]
++[vlatap.files]
+ ;
+ 
+-[zttap300.driver]
+-zttap300.sys,,,6     ; COPYFLG_NOSKIP | COPYFLG_NOVERSIONCHECK
++[vlatap.driver]
++vlatap.sys,,,6     ; COPYFLG_NOSKIP | COPYFLG_NOVERSIONCHECK
+ 
+diff --git a/windows/ZeroTierOne/ServiceInstaller.cpp b/windows/ZeroTierOne/ServiceInstaller.cpp
+index 39a0519..8ba5f7c 100644
+--- a/windows/ZeroTierOne/ServiceInstaller.cpp
++++ b/windows/ZeroTierOne/ServiceInstaller.cpp
+@@ -1,3 +1,4 @@
++// Modified for LAN Launcher VLA: isolated service description.
+ /****************************** Module Header ******************************\
+ * Module Name:  ServiceInstaller.cpp
+ * Project:      CppWindowsService
+@@ -55,7 +56,7 @@ std::string InstallService(PSTR pszServiceName,
+     SC_HANDLE schSCManager = NULL;
+     SC_HANDLE schService = NULL;
+     SERVICE_DESCRIPTION sd;
+-    LPTSTR szDesc = TEXT("ZeroTier network virtualization service.");
++    LPTSTR szDesc = TEXT("LAN Launcher virtual LAN adaptor service.");
+ 
+     DWORD dwCharacters = GetModuleFileName(NULL, path.data(), path.size());
+ 
+diff --git a/windows/ZeroTierOne/ZeroTierOne.rc b/windows/ZeroTierOne/ZeroTierOne.rc
+index 0d7c7a75fcf1179a435cd72ea010be3599d21da4..a941dfc7c8a26f53e104053d5f6a53d301eba14f 100644
+GIT binary patch
+literal 1355
+zcmb_bO>crg5WVlOnBqlaqg7As4P_-pghs?_Vqy%t$R>8zED+PgAKw8Zm3|-C8_ew6
+zH}Adac44NNhy-U4DGiS4g0stH7;_Cv$9#epA(=WQ;9FDBJW-hrImCR&u%Rgx%*G>N
+z{KzHaGJI=wNEabRs8yn(6qX{%b_W=>+py=7>s^Wul`u)D#WBsVkcN=qA!8hjYqb*_
+zgftkBgydj8`-{Muc-uKOEzfn<TYo(pdXA5GYdkp<<ZqW$BduN`jX5mnYB6y~PGC{!
+zmlJ%Vei9Pd7sP8Mm8+AXywNWz)Gh;1xj%>`hGrl|ZknH>cS)-pJwbCs1a}vMSkoM@
+z&>Y_j<|Deb9H#~6GX^7f?^0Ztb9+nOphYlbc3|2R9`B)7z*L5txJz$Jt=dP*oxQOU
+zKMCno{tT%-aS7nLN#W+fAk?)8>EHGOkelw0^crObjE&w%<APRV41UJ=uDyY4g(BlY
+t?&S_#1tOL5--gwjNm4jh&E=I@y)XT1DF<aTi=`wr$EPB-ROweY-T@zePLlut
+
+literal 2664
+zcmdUxOH0E*5Xb*#!S4{;i=tQ`Cy&}{5o;COibA1?HCm`q`T!4pcJ()#F2*KNd>kUn
+zb~e+Q*_r=5lGm4tDhhP0fvz>ugU0Mo6L{zF#+vF%L!PQyWd*v`jUx64{sh{GH-ehp
+zl+!imfG4vy&?7SITGRr!R2(hCjreznbl=IAQu^z<Q^`r2X4%PwPS0%b>QpVY)lp4{
+zI#Ew&+J{@?+*CuCa9aExYY$F?v%lYbDBkkkc^aq=F7p_Np!A@7;-7$y;m{`P3w{rY
+zx=Nge$3FZm_IyUZ&cPK~f12ri#J_lmd5_}in1Yp6Qb^oCs|}C5w_7agy$i^0ME?z4
+zU)~YzGC7ZU@_pFi6nEuVD;ZTVPW05k;kERkxB6Jz)d5u%_f(7i>CjzOZthWC4VKw`
+zW(B#LZET!T!#%W`=&!h28*rO&JJ7nT(;cm0WpmD_{7hP%pX1RH+O>bz)7jnXb8FQ0
+zCWz!q?h$$2^}ERivz0wRyV{t|P|HG$mucB_$iBhsnMB?#S(Cd&z0J>!lDf>1E|nS2
+z@OMA+eA@o8Pv5<%>?UiUp0Q~WFYETK$&s!%Lnq(D-*jiOW>3-^i$1xn9>Py&ZyLd*
+qy<(j$GV{pO-@b*draylRdn}8EL(&`bFu&d-zDMjkG5yX>=lu<?EjS1O
+
+diff --git a/windows/ZeroTierOne/ZeroTierOne.vcxproj b/windows/ZeroTierOne/ZeroTierOne.vcxproj
+index 2dd05aa..c1a9ebf 100644
+--- a/windows/ZeroTierOne/ZeroTierOne.vcxproj
++++ b/windows/ZeroTierOne/ZeroTierOne.vcxproj
+@@ -1,4 +1,5 @@
+-﻿<?xml version="1.0" encoding="utf-8"?>
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Modified for LAN Launcher VLA: isolated build target and dependencies. -->
+ <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug|ARM64">
+@@ -259,7 +260,7 @@
+   </ItemGroup>
+   <PropertyGroup Label="Globals">
+     <ProjectGuid>{B00A4957-5977-4AC1-9EF4-571DC27EADA2}</ProjectGuid>
+-    <RootNamespace>ZeroTierOne</RootNamespace>
++    <RootNamespace>LanLauncherVLA</RootNamespace>
+     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+@@ -307,7 +308,7 @@
+     <PlatformToolset>v143</PlatformToolset>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <UseOfMfc>Static</UseOfMfc>
++    <UseOfMfc>false</UseOfMfc>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>Application</ConfigurationType>
+@@ -315,7 +316,7 @@
+     <PlatformToolset>v143</PlatformToolset>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <UseOfMfc>Static</UseOfMfc>
++    <UseOfMfc>false</UseOfMfc>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+     <ConfigurationType>Application</ConfigurationType>
+@@ -323,7 +324,7 @@
+     <PlatformToolset>v143</PlatformToolset>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <UseOfMfc>Static</UseOfMfc>
++    <UseOfMfc>false</UseOfMfc>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+@@ -359,55 +360,55 @@
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_x86</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_x86</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_x86</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_x64</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_arm64</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_x64</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|ARM64'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_arm64</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_x64</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+     <TargetExt>.exe</TargetExt>
+     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+-    <TargetName>zerotier-one_arm64</TargetName>
++    <TargetName>vla-service</TargetName>
+     <IntDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</IntDir>
+   </PropertyGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+@@ -416,7 +417,7 @@
+       <Optimization>Disabled</Optimization>
+       <SDLCheck>true</SDLCheck>
+       <AdditionalIncludeDirectories>$(SolutionDir)\..\ext;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\core\include;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\simpleapi\include;$(SolutionDir)\..\rustybits\target;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>ZT_SSO_ENABLED=1;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_TRACE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>ZT_SSO_ENABLED=0;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_TRACE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+       <LanguageStandard>stdcpp17</LanguageStandard>
+@@ -427,7 +428,7 @@
+     </ClCompile>
+     <Link>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+-      <AdditionalDependencies>wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;zeroidc.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+       <AdditionalLibraryDirectories>$(SolutionDir)\..\rustybits\target\i686-pc-windows-msvc\debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+     </Link>
+@@ -438,7 +439,7 @@
+       <Optimization>Disabled</Optimization>
+       <SDLCheck>true</SDLCheck>
+       <AdditionalIncludeDirectories>$(SolutionDir)\..\ext;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\core\include;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\simpleapi\include;$(SolutionDir)\..\rustybits\target;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>ZT_SSO_ENABLED=1;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_TRACE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>ZT_SSO_ENABLED=0;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_TRACE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+       <LanguageStandard>stdcpp17</LanguageStandard>
+@@ -459,7 +460,7 @@
+       <Optimization>Disabled</Optimization>
+       <SDLCheck>true</SDLCheck>
+       <AdditionalIncludeDirectories>$(SolutionDir)\..\ext;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\core\include;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\simpleapi\include;$(SolutionDir)\..\rustybits\target;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>ZT_SSO_ENABLED=1;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_TRACE;ZT_RULES_ENGINE_DEBUGGING;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>ZT_SSO_ENABLED=0;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_TRACE;ZT_RULES_ENGINE_DEBUGGING;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+       <LanguageStandard>stdcpp17</LanguageStandard>
+@@ -470,7 +471,7 @@
+     </ClCompile>
+     <Link>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+-      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;zeroidc.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+       <AdditionalOptions>"notelemetry.obj" %(AdditionalOptions)</AdditionalOptions>
+       <AdditionalLibraryDirectories>$(SolutionDir)..\rustybits\target\x86_64-pc-windows-msvc\debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+@@ -493,7 +494,7 @@
+     </ClCompile>
+     <Link>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+-      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;zeroidc.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+       <AdditionalLibraryDirectories>$(SolutionDir)..\rustybits\target\aarch64-pc-windows-msvc\debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+     </Link>
+@@ -504,7 +505,7 @@
+       <Optimization>Disabled</Optimization>
+       <SDLCheck>true</SDLCheck>
+       <AdditionalIncludeDirectories>$(SolutionDir)\..\ext;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\core\include;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\simpleapi\include;$(SolutionDir)\..\rustybits\target;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>ZT_SSO_ENABLED=1;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>ZT_SSO_ENABLED=0;ZT_EXPORT;FD_SETSIZE=1024;NOMINMAX;STATICLIB;WIN32;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+       <LanguageStandard>stdcpp17</LanguageStandard>
+@@ -550,7 +551,7 @@
+       <IntrinsicFunctions>true</IntrinsicFunctions>
+       <SDLCheck>true</SDLCheck>
+       <AdditionalIncludeDirectories>$(SolutionDir)\..\ext;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\core\include;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\simpleapi\include;$(SolutionDir)\..\rustybits\target;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>ZT_SSO_ENABLED=1;ZT_EXPORT;FD_SETSIZE=1024;STATICLIB;ZT_SALSA20_SSE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;WIN32;NOMINMAX;ZT_SOFTWARE_UPDATE_DEFAULT="apply";ZT_BUILD_PLATFORM=2;ZT_BUILD_ARCHITECTURE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>ZT_SSO_ENABLED=0;ZT_EXPORT;FD_SETSIZE=1024;STATICLIB;ZT_SALSA20_SSE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;WIN32;NOMINMAX;ZT_SOFTWARE_UPDATE_DEFAULT="disable";ZT_BUILD_PLATFORM=2;ZT_BUILD_ARCHITECTURE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+       <StringPooling>true</StringPooling>
+       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+@@ -573,7 +574,7 @@
+       <GenerateDebugInformation>false</GenerateDebugInformation>
+       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+       <OptimizeReferences>true</OptimizeReferences>
+-      <AdditionalDependencies>wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;zeroidc.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+       <AdditionalLibraryDirectories>$(SolutionDir)..\rustybits\target\i686-pc-windows-msvc\release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+     </Link>
+@@ -586,7 +587,7 @@
+       <IntrinsicFunctions>true</IntrinsicFunctions>
+       <SDLCheck>true</SDLCheck>
+       <AdditionalIncludeDirectories>$(SolutionDir)\..\ext;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\core\include;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\simpleapi\include;$(SolutionDir)\..\rustybits\target;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>ZT_SSO_ENABLED=1;ZT_EXPORT;FD_SETSIZE=1024;STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="apply";ZT_SALSA20_SSE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;WIN32;NOMINMAX;ZT_BUILD_PLATFORM=2;ZT_BUILD_ARCHITECTURE=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>ZT_SSO_ENABLED=0;ZT_EXPORT;FD_SETSIZE=1024;STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";ZT_SALSA20_SSE;ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;WIN32;NOMINMAX;ZT_BUILD_PLATFORM=2;ZT_BUILD_ARCHITECTURE=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+       <StringPooling>true</StringPooling>
+@@ -611,7 +612,7 @@
+       <GenerateDebugInformation>false</GenerateDebugInformation>
+       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+       <OptimizeReferences>true</OptimizeReferences>
+-      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;zeroidc.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+       <AdditionalLibraryDirectories>$(SolutionDir)..\rustybits\target\x86_64-pc-windows-msvc\release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+     </Link>
+@@ -624,7 +625,7 @@
+       <IntrinsicFunctions>true</IntrinsicFunctions>
+       <SDLCheck>true</SDLCheck>
+       <AdditionalIncludeDirectories>$(SolutionDir)\..\ext;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\core\include;$(SolutionDir)\..\ext\prometheus-cpp-lite-1.0\simpleapi\include;$(SolutionDir)\..\rustybits\target;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>ZT_SSO_ENABLED=1;ZT_EXPORT;FD_SETSIZE=1024;STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="apply";ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;WIN32;NOMINMAX;ZT_BUILD_PLATFORM=2;ZT_BUILD_ARCHITECTURE=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>ZT_SSO_ENABLED=0;ZT_EXPORT;FD_SETSIZE=1024;STATICLIB;ZT_SOFTWARE_UPDATE_DEFAULT="disable";ZT_USE_MINIUPNPC;MINIUPNP_STATICLIB;WIN32;NOMINMAX;ZT_BUILD_PLATFORM=2;ZT_BUILD_ARCHITECTURE=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+       <StringPooling>true</StringPooling>
+@@ -649,7 +650,7 @@
+       <GenerateDebugInformation>false</GenerateDebugInformation>
+       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+       <OptimizeReferences>true</OptimizeReferences>
+-      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;zeroidc.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>wbemuuid.lib;wsock32.lib;ws2_32.lib;Iphlpapi.lib;Rpcrt4.lib;bcrypt.lib;userenv.lib;crypt32.lib;secur32.lib;ncrypt.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+       <AdditionalLibraryDirectories>$(SolutionDir)..\rustybits\target\aarch64-pc-windows-msvc\release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+     </Link>
+diff --git a/windows/ZeroTierOne/ZeroTierOneService.cpp b/windows/ZeroTierOne/ZeroTierOneService.cpp
+index 033a9d2..7fd31eb 100644
+--- a/windows/ZeroTierOne/ZeroTierOneService.cpp
++++ b/windows/ZeroTierOne/ZeroTierOneService.cpp
+@@ -1,3 +1,4 @@
++// Modified for LAN Launcher VLA: isolated service diagnostics.
+ /*
+  * Copyright (c)2019 ZeroTier, Inc.
+  *
+@@ -80,7 +81,7 @@ restart_node:
+ 		}
+ 		switch(_service->run()) {
+ 			case ZeroTier::OneService::ONE_UNRECOVERABLE_ERROR: {
+-				std::string err("ZeroTier One encountered an unrecoverable error: ");
++				std::string err("VLA encountered an unrecoverable error: ");
+ 				err.append(_service->fatalErrorMessage());
+ 				err.append(" (restarting in 5 seconds)");
+ 				WriteEventLogEntry(const_cast <PSTR>(err.c_str()),EVENTLOG_ERROR_TYPE);
+diff --git a/windows/ZeroTierOne/ZeroTierOneService.h b/windows/ZeroTierOne/ZeroTierOneService.h
+index 8fe2099..a550266 100644
+--- a/windows/ZeroTierOne/ZeroTierOneService.h
++++ b/windows/ZeroTierOne/ZeroTierOneService.h
+@@ -36,8 +36,9 @@ extern ZeroTier::Mutex SVCDBGfile_m;
+ #define ZT_SVCDBG(f,...) {}
+ #endif
+ 
+-#define ZT_SERVICE_NAME "ZeroTierOneService"
+-#define ZT_SERVICE_DISPLAY_NAME "ZeroTier One"
++// Modified for LAN Launcher VLA: isolated service identity.
++#define ZT_SERVICE_NAME "LanLauncherVLA"
++#define ZT_SERVICE_DISPLAY_NAME "VLA - Virtual LAN Adaptor"
+ #define ZT_SERVICE_START_TYPE SERVICE_AUTO_START
+ #define ZT_SERVICE_DEPENDENCIES ""
+ //#define ZT_SERVICE_ACCOUNT "NT AUTHORITY\\LocalService"

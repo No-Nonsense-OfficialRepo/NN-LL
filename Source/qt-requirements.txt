@@ -1,0 +1,2 @@
+# UI framework (Qt Quick); the Tk frontend has been removed.
+PySide6==6.12.0

@@ -1,0 +1,3 @@
+# Preserve exact file bytes across Windows and other checkouts.
+# Native patches and provenance use SHA-256; global newline conversion must not alter them.
+* -text

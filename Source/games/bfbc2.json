@@ -1,0 +1,10 @@
+{
+  "id": "bfbc2",
+  "name": "Battlefield: Bad Company 2",
+  "install_dir": "C:/Games/BFBC2",
+  "exe": "BFBC2Game.exe",
+  "args": [],
+  "ports": [{"proto": "udp", "port": 19567}],
+  "prerequisites": ["vcredist_x86"],
+  "config_patch": {"player_name": "{name}", "server_ip": "{host_ip}"}
+}

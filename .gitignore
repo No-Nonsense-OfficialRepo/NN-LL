@@ -1,0 +1,46 @@
+# Generated Windows releases and local build logs
+/LAN Launcher V*/
+/*.zip
+/*.log
+/Source/build/
+/Releases/
+/Exports/
+/Source/tools/legacy/
+/Source/.pytest_cache/
+/Source/.pytest_tmp/
+
+# Python and test byproducts
+.venv/
+venv/
+**/__pycache__/
+*.py[cod]
+*.coverage
+.coverage.*
+
+# Native build inputs and outputs fetched or created locally
+/Source/vla-native/upstream/
+/Source/vla-native/out/
+/Source/vla-native/*.log
+/Source/vendor/ZeroTierOne.msi
+/Source/vendor/vla/
+
+# Local launcher and game data
+**/LanTool-data/
+**/Game Directory/
+**/portable.flag
+/Source/game_files/*
+!/Source/game_files/README.md
+*.sqlite3
+*.sqlite3-*
+*.db
+*.pem
+*.pfx
+*.p12
+*.key
+*.secret
+.env
+.env.*
+!.env.example
+**/host_identity*.json*
+**/client_bundle.json
+**/trusted_host_bundle.json

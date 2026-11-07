@@ -1,0 +1,17 @@
+{
+  "driver_mode": "shared-signed",
+  "architecture": "x64",
+  "source_product_version": "1.16.2",
+  "source_msi_sha256": "42514072b0fe44b8f66e0395bcd23a0b1d1642c28ed00831f1527b2f41b14670",
+  "driver_service": "zttap300",
+  "driver_component": "zttap300",
+  "driver_provider": "ZeroTier",
+  "driver_inf": "driver/zttap300.inf",
+  "device_suffix": ".tap",
+  "hardware_ids": ["root\\zttap300", "zttap300"],
+  "files": {
+    "zttap300.inf": "4afb5e5a2897350926704cdcb427fd69bd2c9f0da271941d1484896b54d294ae",
+    "zttap300.cat": "38c0bbbca2e32509a32150990dbebf98be4ffe2c141a23e878cbeb6c7d483365",
+    "zttap300.sys": "4221486a0d36ef96ab1ed2a537747388655c4c2e470911646f4102d0b88fbdc6"
+  }
+}

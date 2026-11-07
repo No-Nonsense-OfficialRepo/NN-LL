@@ -1,0 +1,22 @@
+{
+  "kit_version": "10.0.28000.0",
+  "package_version": "10.0.28000.2526",
+  "source": "https://api.nuget.org/v3-flatcontainer/",
+  "packages": [
+    {
+      "id": "microsoft.windows.wdk.x64",
+      "bytes": 113683738,
+      "sha256": "63c939fb5a79295bf40e941db592681272219b04edff095fe2f3d123e5579a90"
+    },
+    {
+      "id": "microsoft.windows.sdk.cpp.x64",
+      "bytes": 52967786,
+      "sha256": "a9cae2a8c5da7f5dc5838ae6a76d06d0d2e2fdc3d8cfc69ca6c184e4b9193a00"
+    },
+    {
+      "id": "microsoft.windows.sdk.cpp",
+      "bytes": 160886794,
+      "sha256": "be1b419491607eae6f7c57844ebab39face9643c51e2af1d9176a3ba0d0b23fc"
+    }
+  ]
+}
