@@ -1,22 +1,26 @@
-# No-Nonsense LAN Launcher
+# No-Nonsense LAN Launcher (NNLL)
 
-A Windows Host and Client for private LAN game nights. The Host shares a playlist and verified game files; Clients can join the room, download or repair files, and launch their own games. Game binaries and licenses are not included.
+A Windows Host and Client for private LAN game nights. The Host shares a playlist and verified game files; Clients can join, download or repair files, and launch their own games. Game binaries and game licenses are not included.
 
-This is a test release. The launcher executables are unsigned, so Windows and antivirus products may warn or block them. Network setup can require administrator permission. Host and Client must use the same release version.
+## Download a test build
 
-- [Build the app — prerequisites, steps, outputs and troubleshooting](BUILD-INSTRUCTIONS.md)
-- [How to use the launcher and source layout](Source/README.md)
-- [Implemented features and validation status](Source/FEATURES.md)
-- [Native VLA source and third-party notices](Source/vla-native/README.md)
-- [Report a problem](.github/ISSUE_TEMPLATE/bug_report.md), [contribute](.github/CONTRIBUTING.md), or [report a security issue](.github/SECURITY.md)
-- [Project license](LICENSE): GPLv3 for project-owned code. Bundled third-party components retain their own licenses and notices.
+[Download NNLL v0.9.63 Test Build](https://github.com/No-Nonsense-OfficialRepo/NNLL---TestBuild-V0.9.63/releases/tag/v0.9.63) from the separate test-build repository. Download its attached ZIP, extract it completely, and keep `Host.exe`, `Client.exe`, `Quick Start.exe`, and `Launcher Bin/` together. Host and Client PCs must run the same version.
 
-The Essential Build Source ZIP includes the verified prebuilt VLA runtime for the standard build. The Git source repository omits that assembled runtime; the native README explains how to reproduce and assemble it. See the build guide to choose the right download.
+This repository contains the source. GitHub's automatically generated source ZIP is not a runnable Windows package. The test executables are unsigned, and network setup or launching some games can require administrator permission.
 
-Download the complete Windows package from a GitHub Release when one is published. GitHub's automatically generated source ZIP is source code, not a runnable launcher package. Keep `Host.exe`, `Client.exe`, `Quick Start.exe`, and `Launcher Bin/` together.
+## Build from source
 
-## Community and tutorials
+Follow [BUILD-INSTRUCTIONS.md](BUILD-INSTRUCTIONS.md) for the tested Windows build requirements and steps. A Git clone does not contain the assembled VLA runtime. Follow the [native VLA build and assembly instructions](Source/vla-native/README.md) before building from a clone. The Essential Build Source ZIP described in the build guide includes that runtime when published.
 
-- [No-Nonsense on YouTube](https://www.youtube.com/@NoNonsenseLAN) — app tutorials and walkthroughs are coming soon.
-- [Join our Discord](https://discord.com/invite/a9NgtcnH5r) — quick chats, setup questions and feedback.
-- Use this repository's Issues tab for reproducible bug reports so they can be tracked.
+## Documentation
+
+- [Using the launcher and source layout](Source/README.md)
+- [Features and validation status](Source/FEATURES.md)
+- [Build instructions](BUILD-INSTRUCTIONS.md)
+- [Contributing](.github/CONTRIBUTING.md), [reporting a bug](.github/ISSUE_TEMPLATE/bug_report.md), and [security reports](.github/SECURITY.md)
+
+## Community and license
+
+- [No-Nonsense on YouTube](https://www.youtube.com/@NoNonsenseLAN)
+- [Join the Discord community](https://discord.com/invite/a9NgtcnH5r)
+- [GPL-3.0 project license](LICENSE). Bundled third-party components retain their own licenses and notices.
