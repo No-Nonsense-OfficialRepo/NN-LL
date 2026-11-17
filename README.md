@@ -4,7 +4,7 @@ A Windows Host and Client for private LAN game nights. The Host shares a playlis
 
 ## Download a test build
 
-[Download NNLL v0.9.63 Test Build](https://github.com/No-Nonsense-OfficialRepo/NNLL---TestBuild-V0.9.63/releases/tag/v0.9.63) from the separate test-build repository. Download its attached ZIP, extract it completely, and keep `Host.exe`, `Client.exe`, `Quick Start.exe`, and `Launcher Bin/` together. Host and Client PCs must run the same version.
+[Download NNLL v0.9.63 Test Build](https://github.com/No-Nonsense-OfficialRepo/NN-LL-Test-Build/releases/tag/v0.9.63) from the separate test-build repository. Download its attached ZIP, extract it completely, and keep `Host.exe`, `Client.exe`, `Quick Start.exe`, and `Launcher Bin/` together. Host and Client PCs must run the same version.
 
 This repository contains the source. GitHub's automatically generated source ZIP is not a runnable Windows package. The test executables are unsigned, and network setup or launching some games can require administrator permission.
 
